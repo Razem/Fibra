@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es2017",
+    "lib": ["es2017"],
+    "strict": true,
+    "strictNullChecks": false,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "sourceRoot": "src",
+    "declaration": true,
+    "rootDir": "src",
+    "outDir": "dist"
+  }
+}

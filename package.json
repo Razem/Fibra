@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "name": "fibra",
+  "version": "0.0.0",
+  "description": "Simple multithreading library",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc -w",
+    "test": "node dist/test/index.js"
+  },
+  "author": "Radomír Žemlička <info@razem.cz> (http://razem.cz)",
+  "license": "WTFPL",
+  "devDependencies": {
+    "@types/node": "^7.0.22",
+    "typescript": "^2.3.3"
+  },
+  "engines": {
+    "node": ">=7.10.0"
+  }
+}
