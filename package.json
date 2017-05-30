@@ -10,6 +10,13 @@
     "test": "node dist/test/index.js"
   },
   "author": "Radomír Žemlička <info@razem.cz> (http://razem.cz)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/razem/Fibra.git"
+  },
+  "bugs": {
+    "url": "https://github.com/razem/Fibra/issues"
+  },
   "license": "WTFPL",
   "devDependencies": {
     "@types/node": "^7.0.22",
