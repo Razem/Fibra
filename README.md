@@ -2,6 +2,11 @@
 
 Simple multithreading library for Node.js using child processes.
 
+## Installation
+```
+npm install --save fibra
+```
+
 ## Documentation
 ```
 class Fibra<T>
