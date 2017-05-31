@@ -11,6 +11,8 @@ let id = 0
 export default class Fibra<T> {
   static cores = cpus().length
 
+  private id: number
+
   private imports: Imports
   private api: Assoc = {}
 
@@ -20,8 +22,10 @@ export default class Fibra<T> {
   child: ChildProcess
 
   constructor(private fn: (...args: any[]) => Promise<T>) {
+    this.id = ++id
+
     const caller = getCaller()
-    this.fileName = `${caller}.fibra${++id}`
+    this.fileName = `${caller}.fibra${this.id}`
     this.dirName = path.dirname(caller)
   }
 
@@ -36,6 +40,7 @@ export default class Fibra<T> {
 
   import(imports: Imports) {
     this.imports = imports
+    return this
   }
 
   private createProcess(code: string): Promise<T> {
@@ -49,7 +54,19 @@ export default class Fibra<T> {
     let result: T
     let error: any
 
-    this.child = spawn('node', ['--eval', code], {
+    const args = ['--eval', code]
+
+    // Support debugging
+    const inspect = process.execArgv.find((item) => item.startsWith('--inspect'))
+    if (inspect) {
+      const [flag, masterPort] = inspect.split('=')
+      const port = (+masterPort || 9229) + this.id
+      args.unshift(`${flag}=${port}`)
+
+      console.log(`Starting fibra ${this.id} inspector on port ${port}.`)
+    }
+
+    this.child = spawn('node', args, {
       cwd: process.cwd(),
       env: process.env,
       stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
@@ -68,12 +85,12 @@ export default class Fibra<T> {
       reject(error)
     })
 
-    this.child.on('exit', (code) => {
+    this.child.on('exit', (code, signal) => {
       if (code === 0) {
         resolve(result)
       }
       else {
-        reject(error)
+        reject(error || new Error(signal))
       }
     })
 
@@ -100,5 +117,11 @@ export default class Fibra<T> {
     code += `);\n`
 
     return this.createProcess(code)
+  }
+
+  kill() {
+    if (this.child) {
+      this.child.kill('SIGKILL')
+    }
   }
 }
