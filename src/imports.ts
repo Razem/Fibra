@@ -16,7 +16,7 @@ export function generateImports(imports: Imports) {
         res.push(`${module}: ${require}`)
       }
       else {
-        res.push(`${def || module}: ${require}['default']`)
+        res.push(`${def || module}: ${require}.default`)
       }
     }
     else if (def instanceof Array) {
