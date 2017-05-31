@@ -1,0 +1,6 @@
+/node_modules/
+/dist/test/
+/src/
+/.*/
+*.cmd
+*.exe
