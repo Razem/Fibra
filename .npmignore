@@ -1,6 +1,8 @@
 /node_modules/
 /dist/test/
+/dist/**/*.js.map
 /src/
+.gitignore
 /.*/
 *.cmd
 *.exe
