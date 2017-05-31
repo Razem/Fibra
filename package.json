@@ -1,8 +1,14 @@
 {
-  "private": true,
   "name": "fibra",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Simple multithreading library",
+  "keywords": [
+    "fiber", "fibers",
+    "thread", "threads",
+    "coroutine", "coroutines",
+    "worker", "workers",
+    "parallel", "async"
+  ],
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
