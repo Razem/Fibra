@@ -21,7 +21,7 @@ export default class Fibra<T, I = any> {
 
   child: ChildProcess
 
-  constructor(private fn: (this: { import: I }, ...args: any[]) => Promise<T>, options: { import?: Imports } = {}) {
+  constructor(private task: (this: { import: I }, ...args: any[]) => Promise<T>, options: { import?: Imports } = {}) {
     this.id = ++id
 
     const caller = getCaller()
@@ -107,7 +107,7 @@ export default class Fibra<T, I = any> {
       context.push(`import: ${imports}`)
     }
 
-    code += `(${this.fn.toString()}).apply({${context.join(', ')}}, ${JSON.stringify(args)})\n`
+    code += `(${this.task.toString()}).apply({${context.join(', ')}}, ${JSON.stringify(args)})\n`
     code += `.then(\n`
     code += `  function (r) { process.send({ type: 'exit', result: r }); },\n`
     code += `  function (e) { process.send({ type: 'exit', error: e }); process.exit(1); }\n`
