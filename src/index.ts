@@ -13,7 +13,7 @@ export default class Fibra<T, I = any> {
 
   private id: number
 
-  private import: Imports
+  private import?: Imports
   private api: Assoc = {}
 
   private fileName: string
@@ -102,9 +102,11 @@ export default class Fibra<T, I = any> {
 
     const context = []
 
-    const imports = generateImports(this.import)
-    if (imports) {
-      context.push(`import: ${imports}`)
+    if (this.import) {
+      const imports = generateImports(this.import)
+      if (imports) {
+        context.push(`import: ${imports}`)
+      }
     }
 
     code += `(${this.task.toString()}).apply({${context.join(', ')}}, ${JSON.stringify(args)})\n`
