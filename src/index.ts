@@ -8,12 +8,12 @@ export type Assoc = { [key: string]: any }
 
 let id = 0
 
-export default class Fibra<T> {
+export default class Fibra<T, I = any> {
   static cores = cpus().length
 
   private id: number
 
-  private imports: Imports
+  private import: Imports
   private api: Assoc = {}
 
   private fileName: string
@@ -21,12 +21,14 @@ export default class Fibra<T> {
 
   child: ChildProcess
 
-  constructor(private fn: (...args: any[]) => Promise<T>) {
+  constructor(private fn: (this: { import: I }, ...args: any[]) => Promise<T>, options: { import?: Imports } = {}) {
     this.id = ++id
 
     const caller = getCaller()
     this.fileName = `${caller}.fibra${this.id}`
     this.dirName = path.dirname(caller)
+
+    this.import = options.import
   }
 
   private generateFs() {
@@ -36,11 +38,6 @@ export default class Fibra<T> {
 
   private generateAux() {
     return `Error.prototype.toJSON = function () { return { message: this.message, name: this.name }; };\n`
-  }
-
-  import(imports: Imports) {
-    this.imports = imports
-    return this
   }
 
   private createProcess(code: string): Promise<T> {
@@ -103,14 +100,14 @@ export default class Fibra<T> {
     code += this.generateFs()
     code += this.generateAux()
 
-    const allArgs = args.map((item) => JSON.stringify(item))
+    const context = []
 
-    const imports = generateImports(this.imports)
+    const imports = generateImports(this.import)
     if (imports) {
-      allArgs.unshift(imports)
+      context.push(`import: ${imports}`)
     }
 
-    code += `(${this.fn.toString()}).apply(null, [${allArgs.join(', ')}])\n`
+    code += `(${this.fn.toString()}).apply({${context.join(', ')}}, ${JSON.stringify(args)})\n`
     code += `.then(\n`
     code += `  function (r) { process.send({ type: 'exit', result: r }); },\n`
     code += `  function (e) { process.send({ type: 'exit', error: e }); process.exit(1); }\n`

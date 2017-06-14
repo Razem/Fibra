@@ -1,27 +1,35 @@
 import Fibra from '..'
 
+const t = new Fibra(async function () {
+  return 1
+})
+
 async function main() {
-  const runnable = async (imports: any, i: number) => {
-    const { Fibra } = imports
+  type I = { Fibra: typeof Fibra }
 
-    const date = Date.now()
-    while (Date.now() - date < 10000 * i) {}
-
-    debugger
-    if (1) throw new Error(Fibra.name)
-
-    return Fibra.name
-  }
-
-  const fibras: Fibra<string>[] = []
+  const fibras: Fibra<string, I>[] = []
 
   for (let i = 1; i <= Fibra.cores; ++i) {
-    const fibra = new Fibra<string>(runnable)
-    fibra.import({
-      path: '*',
-      child_process: ['spawn'],
-      '..': 'Fibra',
-    })
+    const fibra = new Fibra<string, I>(
+      async function (i: number) {
+        const { Fibra } = this.import
+
+        const date = Date.now()
+        while (Date.now() - date < 10000 * i) {}
+
+        debugger
+        if (1) throw new Error(Fibra.name)
+
+        return Fibra.name
+      },
+      {
+        import: {
+          path: '*',
+          child_process: ['spawn'],
+          '..': 'Fibra',
+        }
+      }
+    )
 
     fibras.push(fibra)
 
