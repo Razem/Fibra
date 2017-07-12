@@ -10,7 +10,7 @@ npm install --save fibra
 ## Documentation
 ```
 class Fibra<T, I = any>
-  constructor(fn: (this: { import: I }, ...args: any[]) => Promise<T>, options?: { import?: Imports })
+  constructor(task: (this: { import: I }, ...args: any[]) => Promise<T>, options?: { import?: Imports })
   run(...args: any[]): Promise<T>
   kill(): void
   static cores: number
