@@ -43,7 +43,7 @@ export default class Fibra<T, I = any> {
   private createProcess(code: string): Promise<T> {
     let resolve: (value: T) => void
     let reject: (error: any) => void
-    const promise = new Promise((_resolve, _reject) => {
+    const promise = new Promise<T>((_resolve, _reject) => {
       resolve = _resolve
       reject = _reject
     })

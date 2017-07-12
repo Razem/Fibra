@@ -3,11 +3,16 @@
   "version": "0.0.1",
   "description": "Simple multithreading library",
   "keywords": [
-    "fiber", "fibers",
-    "thread", "threads",
-    "coroutine", "coroutines",
-    "worker", "workers",
-    "parallel", "async"
+    "fiber",
+    "fibers",
+    "thread",
+    "threads",
+    "coroutine",
+    "coroutines",
+    "worker",
+    "workers",
+    "parallel",
+    "async"
   ],
   "main": "dist/index.js",
   "scripts": {
@@ -18,17 +23,17 @@
   "author": "Radomír Žemlička <info@razem.cz> (http://razem.cz)",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/razem/Fibra.git"
+    "url": "git+https://github.com/Razem/Fibra.git"
   },
   "bugs": {
-    "url": "https://github.com/razem/Fibra/issues"
+    "url": "https://github.com/Razem/Fibra/issues"
   },
   "license": "WTFPL",
   "devDependencies": {
-    "@types/node": "^7.0.22",
-    "typescript": "^2.3.3"
+    "@types/node": "^7.0.34",
+    "typescript": "^2.4.1"
   },
   "engines": {
-    "node": ">=7.10.0"
+    "node": ">=7.6.0"
   }
 }
