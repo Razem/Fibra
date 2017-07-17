@@ -7,6 +7,8 @@ import { generateApi } from './api'
 
 let id = 0
 
+export type Task<T, I = any, A = any> = (this: { import: I, api: A }, ...args: any[]) => Promise<T>
+
 export default class Fibra<T, I = any, A = any> {
   static cores = cpus().length
 
@@ -20,7 +22,7 @@ export default class Fibra<T, I = any, A = any> {
 
   child: ChildProcess
 
-  constructor(private task: (this: { import: I, api: A }, ...args: any[]) => Promise<T>, options: { import?: Imports, api?: A } = {}) {
+  constructor(private task: Task<T, I, A>, options: { import?: Imports, api?: A } = {}) {
     this.id = ++id
 
     const caller = getCaller()
