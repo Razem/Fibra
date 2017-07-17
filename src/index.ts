@@ -148,7 +148,8 @@ export default class Fibra<T, I = any, A = any> {
     code += `.then(\n`
     code += `  function (r) { process.send({ type: 'exit', result: r }); },\n`
     code += `  function (e) { process.send({ type: 'exit', error: e }); process.exit(1); }\n`
-    code += `);\n`
+    code += `)\n`
+    code += `.then(function () { process.removeAllListeners(); });\n`
 
     return this.createProcess(code)
   }
