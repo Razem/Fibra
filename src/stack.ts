@@ -5,13 +5,13 @@ declare global {
 }
 
 export function getStack(): any[] {
-  var origPrepareStackTrace = Error.prepareStackTrace
+  const origPrepareStackTrace = Error.prepareStackTrace
   Error.prepareStackTrace = function (_, stack) {
     return stack
   }
 
-  var err = new Error()
-  var stack = <any>(err.stack)
+  const err = new Error()
+  const stack = <any[]><any>(err.stack)
 
   Error.prepareStackTrace = origPrepareStackTrace
 
@@ -25,6 +25,6 @@ export function getStack(): any[] {
 // getFunctionName
 
 export function getCaller(): string {
-  var stack = getStack()
+  const stack = getStack()
   return stack[2].getFileName()
 }
