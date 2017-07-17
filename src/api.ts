@@ -22,7 +22,7 @@ const api = `(function () {
     }
   });
   var api = function (path) {
-    return new Proxy({ path: path }, {
+    return new Proxy(function () { return path; }, {
       get: function (target, prop) {
         if (prop === 'then') {
           var request = createRequest();
