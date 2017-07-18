@@ -1,6 +1,6 @@
 {
   "name": "fibra",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Simple multithreading library",
   "keywords": [
     "fiber",
@@ -31,7 +31,7 @@
   },
   "license": "WTFPL",
   "dependencies": {
-    "@types/node": "^7.0.34"
+    "@types/node": "^7.0.38"
   },
   "devDependencies": {
     "typescript": "^2.4.1"
