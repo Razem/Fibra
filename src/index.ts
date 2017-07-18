@@ -3,25 +3,26 @@ import { cpus } from 'os'
 import * as path from 'path'
 import { getCaller } from './stack'
 import { generateImports, Imports } from './imports'
-
-export type Assoc = { [key: string]: any }
+import { generateApi } from './api'
 
 let id = 0
 
-export default class Fibra<T, I = any> {
+export type Task<T, I = any, A = any> = (this: { import: I, api: A }, ...args: any[]) => Promise<T>
+
+export default class Fibra<T, I = any, A = any> {
   static cores = cpus().length
 
   private id: number
 
   private import?: Imports
-  private api: Assoc = {}
+  private api?: A
 
   private fileName: string
   private dirName: string
 
-  child: ChildProcess
+  private child: ChildProcess
 
-  constructor(private task: (this: { import: I }, ...args: any[]) => Promise<T>, options: { import?: Imports } = {}) {
+  constructor(private task: Task<T, I, A>, options: { import?: Imports, api?: A } = {}) {
     this.id = ++id
 
     const caller = getCaller()
@@ -29,6 +30,7 @@ export default class Fibra<T, I = any> {
     this.dirName = path.dirname(caller)
 
     this.import = options.import
+    this.api = options.api
   }
 
   private generateFs() {
@@ -75,6 +77,36 @@ export default class Fibra<T, I = any> {
           result = data.result
           error = data.error
           break
+
+        case 'prop':
+          (async () => {
+            try {
+              const result = await (data.path as string[]).reduce((obj, key) => obj[key], this.api as any)
+              this.child.send({ id: data.id, result })
+            }
+            catch (error) {
+              this.child.send({ id: data.id, error })
+            }
+          })()
+          break
+
+        case 'call':
+          (async () => {
+            try {
+              const fn = (data.path as string[]).pop() as string
+              const obj = (data.path as string[]).reduce((obj, key) => obj[key], this.api as any)
+              const result = await obj[fn].apply(obj, data.args)
+              this.child.send({ id: data.id, result })
+            }
+            catch (error) {
+              this.child.send({ id: data.id, error })
+            }
+          })()
+          break
+
+        default:
+          console.error(`Unknown action ${data.type}!`)
+          break
       }
     })
 
@@ -104,14 +136,17 @@ export default class Fibra<T, I = any> {
 
     if (this.import) {
       const imports = generateImports(this.import)
-      if (imports) {
-        context.push(`import: ${imports}`)
-      }
+      context.push(`import: ${imports}`)
+    }
+
+    if (this.api) {
+      const api = generateApi()
+      context.push(`api: ${api}`)
     }
 
     code += `(${this.task.toString()}).apply({${context.join(', ')}}, ${JSON.stringify(args)})\n`
     code += `.then(\n`
-    code += `  function (r) { process.send({ type: 'exit', result: r }); },\n`
+    code += `  function (r) { process.send({ type: 'exit', result: r }); process.removeAllListeners(); },\n`
     code += `  function (e) { process.send({ type: 'exit', error: e }); process.exit(1); }\n`
     code += `);\n`
 

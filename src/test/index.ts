@@ -1,53 +1,45 @@
-import Fibra from '..'
+import * as readline from 'readline'
+import * as fs from 'fs'
 
-const t = new Fibra(async function () {
-  return 1
-})
-
-async function main() {
-  type I = { Fibra: typeof Fibra }
-
-  const fibras: Fibra<string, I>[] = []
-
-  for (let i = 1; i <= Fibra.cores; ++i) {
-    const fibra = new Fibra<string, I>(
-      async function (i: number) {
-        const { Fibra } = this.import
-
-        const date = Date.now()
-        while (Date.now() - date < 10000 * i) {}
-
-        debugger
-        if (1) throw new Error(Fibra.name)
-
-        return Fibra.name
-      },
-      {
-        import: {
-          path: '*',
-          child_process: ['spawn'],
-          '..': 'Fibra',
-        }
-      }
-    )
-
-    fibras.push(fibra)
-
-    fibra.run(i).then((res) => console.log('res', i, res), (err) => console.error('err', i, err))
+function run(test: string) {
+  let main: () => Promise<any>
+  try {
+    main = require(`./${test}`).default
+  }
+  catch (err) {
+    console.error(`[ERROR] Test ${test} does not exist!`)
+    return
   }
 
-  let time = 1000
-  let counter = 50000 / time
-  let iter = 0
-  const interval = setInterval(function () {
-    console.log('test')
-    if (++iter === 2) {
-      fibras[0].kill()
-    }
-    if (--counter <= 0) {
-      clearInterval(interval)
-    }
-  }, time)
+  console.log(`[TEST ${test} START]`)
+
+  return main()
+    .then((res) => console.log(`[TEST ${test} SUCCESS]`, res))
+    .catch((err) => console.error(`[TEST ${test} FAIL]`, err))
 }
 
-main().catch((err) => console.error(err))
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+})
+
+rl.question('Test: ', (test) => {
+  if (test) {
+    run(test)
+  }
+  else {
+    (async function () {
+      const dir = fs.readdirSync('./dist/test')
+
+      for (const file of dir) {
+        if (file.endsWith('.js') && file !== 'index.js') {
+          await run(file.replace(/\.js$/, ''))
+        }
+      }
+    })()
+  }
+
+  rl.question('', () => {
+    rl.close()
+  })
+})
