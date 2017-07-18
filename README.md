@@ -67,8 +67,7 @@ setTimeout(() => {
 fibra.run(2, 5).then((res) => console.log(res))
 ```
 
-## TODO
-- API calls based on messages
+## Todo
 - Mutexes - locking shared resources
 
 ## Known issues
