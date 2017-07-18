@@ -19,12 +19,22 @@ export default async function () {
           reject('fail')
         }, 500)
       })
+    },
+    deep: {
+      a: {
+        b: {
+          c: true,
+          d() {
+            return true
+          }
+        }
+      }
     }
   }
 
   const fibra = new Fibra(
     async function (a: number) {
-      const { array, syncFn, asyncFn, asyncFnError } = this.api
+      const { array, syncFn, asyncFn, asyncFnError, deep } = this.api
 
       console.log('length', await array.length)
 
@@ -46,6 +56,16 @@ export default async function () {
       catch (err) {
         console.error('async fn error', err)
       }
+
+      console.log(
+        'deep',
+        (await deep).a.b.c
+          && (await deep.a).b.c
+          && (await deep.a.b).c
+          && (await deep.a.b.c)
+          && !(await deep).a.b.d
+          && (await deep.a.b.d())
+      )
 
       return 'done'
     },
