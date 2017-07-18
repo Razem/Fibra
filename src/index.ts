@@ -146,10 +146,9 @@ export default class Fibra<T, I = any, A = any> {
 
     code += `(${this.task.toString()}).apply({${context.join(', ')}}, ${JSON.stringify(args)})\n`
     code += `.then(\n`
-    code += `  function (r) { process.send({ type: 'exit', result: r }); },\n`
+    code += `  function (r) { process.send({ type: 'exit', result: r }); process.removeAllListeners(); },\n`
     code += `  function (e) { process.send({ type: 'exit', error: e }); process.exit(1); }\n`
-    code += `)\n`
-    code += `.then(function () { process.removeAllListeners(); });\n`
+    code += `);\n`
 
     return this.createProcess(code)
   }
