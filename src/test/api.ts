@@ -1,8 +1,29 @@
 import Fibra from '..'
 
 export default async function () {
+  const api = {
+    array: [1, 2, 3],
+    syncFn(a: number, b: number) {
+      return a + b
+    },
+    asyncFn() {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve('success')
+        }, 500)
+      })
+    },
+    asyncFnError() {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          reject('fail')
+        }, 500)
+      })
+    }
+  }
+
   const fibra = new Fibra(
-    async function (a) {
+    async function (a: number) {
       const { array, syncFn, asyncFn, asyncFnError } = this.api
 
       console.log('length', await array.length)
@@ -26,31 +47,12 @@ export default async function () {
         console.error('async fn error', err)
       }
 
-      console.log('DONE')
+      return 'done'
     },
     {
-      api: {
-        array: [1, 2, 3],
-        syncFn: function (a: number, b: number) {
-          return a + b
-        },
-        asyncFn: function () {
-          return new Promise((resolve, reject) => {
-            setTimeout(() => {
-              resolve('success')
-            }, 500)
-          })
-        },
-        asyncFnError: function () {
-          return new Promise((resolve, reject) => {
-            setTimeout(() => {
-              reject('fail')
-            }, 500)
-          })
-        }
-      }
+      api
     }
   )
 
-  await fibra.run(1)
+  return fibra.run(1)
 }
