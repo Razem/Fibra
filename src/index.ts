@@ -20,7 +20,7 @@ export default class Fibra<T, I = any, A = any> {
   private fileName: string
   private dirName: string
 
-  child: ChildProcess
+  private child: ChildProcess
 
   constructor(private task: Task<T, I, A>, options: { import?: Imports, api?: A } = {}) {
     this.id = ++id
