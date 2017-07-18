@@ -19,7 +19,11 @@ class Fibra<T, I = any, A = any>
   static cores: number
     * The amount of CPU cores
 
+type ImportSubItem = string | [string, string]
+type ImportItem = string | ImportSubItem[]
+
 interface Imports
+  [key: string]: ImportItem
   * key: module name
   * value:
     * '' or 'name' for default import
